@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class GameConnection implements Runnable {
 
     final int _BUF_SIZE = 1024;
-    final int _NAME_SIZE = 256;
+    final int _NAME_SIZE = 254;
     final int _NAME_OFFSET = (_BUF_SIZE - _NAME_SIZE);
     final int _OFFSET = 8;
     int _THIS_CONNECTION = 0;
@@ -33,7 +33,7 @@ public class GameConnection implements Runnable {
     byte[] _PLAYER_NAME = new byte[_NAME_SIZE];
     InetAddress _CLIENT_ADDR;
     int _CLIENT_PORT;
-    int _SEGMENT_SIZE = 0;
+    int _SEGMENT_SIZE = 254;
     String line;
     boolean updateFromServer = false, updateFromClient = false;
     byte[] updateBuffer = new byte[_BUF_SIZE];
@@ -43,7 +43,7 @@ public class GameConnection implements Runnable {
     BufferedInputStream nIn = null;
     private Socket client;
     private GameState gs;
-    //private GAME game;
+    private Game game;
 
     public GameConnection(Socket client, int currentConnections) {
         this.client = client;
@@ -76,18 +76,14 @@ public class GameConnection implements Runnable {
         try {
             //Loop
             while (nIn.read(buffer) > 0 /*connected*/) {
-
                 //Notify all connected something has come in and 
                 //that it needs to mutex
-                    //this.signalWait
+                //update the internal game
+                signalUpdate(buffer);
 
-                //Update the Game
-                    //mapClientActionToGame
+                clearBuf();
+                updateBufferFromServerPacketHeader(buffer);
                 
-                //Notify all that the thing has been updated
-                    //this.signalDone
-                
-                //Update the client
                 sendGameData();
 
             }
@@ -96,16 +92,31 @@ public class GameConnection implements Runnable {
         }
     }
 
-    /*public void onReceive(Signal signal){
-     *  if signal == wait
-     *      wait
-     * 
-     *  else if signal == done
-     *      wake up
-     * }
-     * */
-     
-    
+    public void signalUpdate(byte[] buf) {
+
+        //not our turn, sit and spin
+        while (Server.canUpdate[_LOBBY_SELECTION] != (byte) _THIS_CONNECTION) {
+            //notify need of turn
+            if (Server.notify[_LOBBY_SELECTION] != 1) {
+                Server.canUpdate[_LOBBY_SELECTION] = (byte) _THIS_CONNECTION;
+            }
+        }
+        //claim mutex
+        if (Server.notify[_LOBBY_SELECTION] != 1) {
+            Server.notify[_LOBBY_SELECTION] = 1;
+            
+            //Perform changes on gamestate
+
+            Server.xCoord[_LOBBY_SELECTION] = buffer[_OFFSET];
+            Server.yCoord[_LOBBY_SELECTION] = buffer[_OFFSET + 1];
+            Server.charVal[_LOBBY_SELECTION] = Byte.toString(buffer[_OFFSET + 3]).charAt(0);
+            game.insertChar(Server.xCoord[_LOBBY_SELECTION], Server.yCoord[_LOBBY_SELECTION], Server.charVal[_LOBBY_SELECTION]);
+            
+            //release mutex
+            Server.notify[_LOBBY_SELECTION] = 0;
+        }
+    }
+
     private void loadLobbies() {
         //load the lobbies into the packet data for the client
         for (int i = 0; i < _OFFSET; i++) {
@@ -146,7 +157,7 @@ public class GameConnection implements Runnable {
         //TODO: Client side handles no-touchy full lobbies for now?
         if (Server._LOBBY_STATE[_LOBBY_SELECTION] == 0) //make a new game if there is none.
         {
-            Server.newGame();
+            Server.newGame(_LOBBY_SELECTION);
         }
 
         //Increment number of players in the lobby
@@ -171,7 +182,7 @@ public class GameConnection implements Runnable {
 
         //Give the connection a hadle to the lobby's gamestate
         gs = Server.gs[_LOBBY_SELECTION];
-        //game = Server.games[_LOBBY_SELECTION];
+        game = Server.games[_LOBBY_SELECTION];
 
         //add the player's name to the gamestate
         gs._PLAYERS_IN_LOBBY[_SERVER_PACKET_HEADER[5]] = _PLAYER_NAME;
@@ -182,6 +193,8 @@ public class GameConnection implements Runnable {
         _SERVER_PACKET_HEADER[0] = 30; //sending game data
         updateBufferFromServerPacketHeader(buffer);
 
+        byte[] buf = new byte[_SEGMENT_SIZE];
+        buf = game.mem_pos.toBytes();
 
         //From 0 to the beginning of player name, in SIZE-sized segments
         for (int i = 0; i < ((_NAME_OFFSET - _OFFSET) / _SEGMENT_SIZE); i++) {
@@ -195,14 +208,14 @@ public class GameConnection implements Runnable {
     }
 
     private void updateBufferFromServerPacketHeader(byte[] buf) {
-        //before we send a packet, update it with our server packet header
+        //before we send a packet, canUpdate it with our server packet header
         for (int i = 0; i < _OFFSET; i++) {
             buf[i] = _SERVER_PACKET_HEADER[i];
         }
     }
 
     private void updateClientPacketHeaderFromBuffer(byte[] buf) {
-        //when we get a packet in, update our client packet header from it
+        //when we get a packet in, canUpdate our client packet header from it
         for (int i = 0; i < _OFFSET; i++) {
             _CLIENT_PACKET_HEADER[i] = buf[i];
         }
