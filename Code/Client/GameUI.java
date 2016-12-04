@@ -49,6 +49,7 @@ public class GameUI extends javax.swing.JFrame {
         playersInLobby7 = new javax.swing.JLabel();
         playersInLobby8 = new javax.swing.JLabel();
         gameViewPanel = new javax.swing.JPanel();
+        gameView1 = new client.GameView();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenuOption = new javax.swing.JMenu();
         fileNewGame = new javax.swing.JMenuItem();
@@ -202,15 +203,32 @@ public class GameUI extends javax.swing.JFrame {
         gameViewPanel.setBackground(new java.awt.Color(140, 140, 140));
         gameViewPanel.setPreferredSize(new java.awt.Dimension(280, 249));
 
+        javax.swing.GroupLayout gameView1Layout = new javax.swing.GroupLayout(gameView1);
+        gameView1.setLayout(gameView1Layout);
+        gameView1Layout.setHorizontalGroup(
+            gameView1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 430, Short.MAX_VALUE)
+        );
+        gameView1Layout.setVerticalGroup(
+            gameView1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout gameViewPanelLayout = new javax.swing.GroupLayout(gameViewPanel);
         gameViewPanel.setLayout(gameViewPanelLayout);
         gameViewPanelLayout.setHorizontalGroup(
             gameViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 450, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, gameViewPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(gameView1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         gameViewPanelLayout.setVerticalGroup(
             gameViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, gameViewPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(gameView1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout currentViewPanelLayout = new javax.swing.GroupLayout(currentViewPanel);
@@ -324,6 +342,7 @@ public class GameUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem fileExit;
     private javax.swing.JMenu fileMenuOption;
     private javax.swing.JMenuItem fileNewGame;
+    private client.GameView gameView1;
     private javax.swing.JPanel gameViewPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenuBar jMenuBar1;

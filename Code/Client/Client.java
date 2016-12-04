@@ -16,7 +16,7 @@ import java.net.Socket;
  */
 public class Client {
     final int _BUF_SIZE = 1024;
-    final int _NAME_SIZE = 256;
+    final int _NAME_SIZE = 254;
     final int _NAME_OFFSET = (_BUF_SIZE - _NAME_SIZE);
     final int _OFFSET = 8;
     int _THIS_CONNECTION = 0;
@@ -27,7 +27,7 @@ public class Client {
     byte[] _PLAYER_NAME = new byte[_NAME_SIZE];
     InetAddress _SERVER_ADDR;
     int _SERVER_PORT;
-    int _SEGMENT_SIZE = 0;
+    int _SEGMENT_SIZE = 254;
     String line;
     boolean updateFromServer = false, updateFromClient = false;
     byte[] updateBuffer = new byte[_BUF_SIZE];
@@ -38,7 +38,18 @@ public class Client {
     
     private Socket server;
     
+    private GameUI game;
     
+    
+    
+    public static void main (String[] args){
+        
+        
+        
+        
+        
+        
+    }
     
     
     
