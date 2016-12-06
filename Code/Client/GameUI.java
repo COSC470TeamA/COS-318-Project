@@ -4,6 +4,10 @@
  */
 package client;
 
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Chris Mazur
@@ -49,7 +53,7 @@ public class GameUI extends javax.swing.JFrame {
         playersInLobby7 = new javax.swing.JLabel();
         playersInLobby8 = new javax.swing.JLabel();
         gameViewPanel = new javax.swing.JPanel();
-        gameView1 = new client.GameView();
+        clientGameView = new client.GameView();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenuOption = new javax.swing.JMenu();
         fileNewGame = new javax.swing.JMenuItem();
@@ -119,44 +123,41 @@ public class GameUI extends javax.swing.JFrame {
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(joinSelectedLobbyButton))
                     .addGroup(lobbyPanelLayout.createSequentialGroup()
+                        .addContainerGap()
                         .addGroup(lobbyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(lobbyPanelLayout.createSequentialGroup()
-                                .addContainerGap()
+                                .addComponent(radioJoinLobby7)
+                                .addGap(27, 27, 27)
+                                .addComponent(playersInLobby7))
+                            .addGroup(lobbyPanelLayout.createSequentialGroup()
+                                .addComponent(radioJoinLobby8)
+                                .addGap(27, 27, 27)
+                                .addComponent(playersInLobby8))
+                            .addGroup(lobbyPanelLayout.createSequentialGroup()
+                                .addComponent(radioJoinLobby5)
+                                .addGap(27, 27, 27)
+                                .addComponent(playersInLobby5))
+                            .addGroup(lobbyPanelLayout.createSequentialGroup()
+                                .addComponent(radioJoinLobby6)
+                                .addGap(27, 27, 27)
+                                .addComponent(playersInLobby6))
+                            .addGroup(lobbyPanelLayout.createSequentialGroup()
+                                .addComponent(radioJoinLobby3)
+                                .addGap(27, 27, 27)
+                                .addComponent(playersInLobby3))
+                            .addGroup(lobbyPanelLayout.createSequentialGroup()
+                                .addComponent(radioJoinLobby4)
+                                .addGap(27, 27, 27)
+                                .addComponent(playersInLobby4))
+                            .addGroup(lobbyPanelLayout.createSequentialGroup()
                                 .addGroup(lobbyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(lobbyPanelLayout.createSequentialGroup()
-                                        .addComponent(radioJoinLobby7)
-                                        .addGap(27, 27, 27)
-                                        .addComponent(playersInLobby7))
-                                    .addGroup(lobbyPanelLayout.createSequentialGroup()
-                                        .addComponent(radioJoinLobby8)
-                                        .addGap(27, 27, 27)
-                                        .addComponent(playersInLobby8))
-                                    .addGroup(lobbyPanelLayout.createSequentialGroup()
-                                        .addComponent(radioJoinLobby5)
-                                        .addGap(27, 27, 27)
-                                        .addComponent(playersInLobby5))
-                                    .addGroup(lobbyPanelLayout.createSequentialGroup()
-                                        .addComponent(radioJoinLobby6)
-                                        .addGap(27, 27, 27)
-                                        .addComponent(playersInLobby6))
-                                    .addGroup(lobbyPanelLayout.createSequentialGroup()
-                                        .addComponent(radioJoinLobby3)
-                                        .addGap(27, 27, 27)
-                                        .addComponent(playersInLobby3))
-                                    .addGroup(lobbyPanelLayout.createSequentialGroup()
-                                        .addComponent(radioJoinLobby4)
-                                        .addGap(27, 27, 27)
-                                        .addComponent(playersInLobby4))
-                                    .addGroup(lobbyPanelLayout.createSequentialGroup()
-                                        .addGroup(lobbyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(radioJoinLobby2)
-                                            .addComponent(radioJoinLobby1))
-                                        .addGap(27, 27, 27)
-                                        .addGroup(lobbyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(playersInLobby1)
-                                            .addComponent(playersInLobby2)))))
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                    .addComponent(radioJoinLobby2)
+                                    .addComponent(radioJoinLobby1))
+                                .addGap(27, 27, 27)
+                                .addGroup(lobbyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(playersInLobby1)
+                                    .addComponent(playersInLobby2)))))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         lobbyPanelLayout.setVerticalGroup(
@@ -203,14 +204,16 @@ public class GameUI extends javax.swing.JFrame {
         gameViewPanel.setBackground(new java.awt.Color(140, 140, 140));
         gameViewPanel.setPreferredSize(new java.awt.Dimension(280, 249));
 
-        javax.swing.GroupLayout gameView1Layout = new javax.swing.GroupLayout(gameView1);
-        gameView1.setLayout(gameView1Layout);
-        gameView1Layout.setHorizontalGroup(
-            gameView1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 430, Short.MAX_VALUE)
+        clientGameView.setBorder(new javax.swing.border.MatteBorder(null));
+
+        javax.swing.GroupLayout clientGameViewLayout = new javax.swing.GroupLayout(clientGameView);
+        clientGameView.setLayout(clientGameViewLayout);
+        clientGameViewLayout.setHorizontalGroup(
+            clientGameViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 428, Short.MAX_VALUE)
         );
-        gameView1Layout.setVerticalGroup(
-            gameView1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        clientGameViewLayout.setVerticalGroup(
+            clientGameViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
@@ -218,16 +221,16 @@ public class GameUI extends javax.swing.JFrame {
         gameViewPanel.setLayout(gameViewPanelLayout);
         gameViewPanelLayout.setHorizontalGroup(
             gameViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, gameViewPanelLayout.createSequentialGroup()
+            .addGroup(gameViewPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(gameView1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(clientGameView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         gameViewPanelLayout.setVerticalGroup(
             gameViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, gameViewPanelLayout.createSequentialGroup()
+            .addGroup(gameViewPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(gameView1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(clientGameView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -262,7 +265,6 @@ public class GameUI extends javax.swing.JFrame {
             }
         });
         fileMenuOption.add(fileNewGame);
-        fileNewGame.getAccessibleContext().setAccessibleName("New Game");
 
         fileExit.setText("Exit");
         fileExit.setActionCommand("fileExitGame");
@@ -328,21 +330,41 @@ public class GameUI extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(GameUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                
                 new GameUI().setVisible(true);
+                Client client = new Client();
+                clientGameView = client.gameView;
+                
+                
+                try {
+                    clientGameView.main(new String[2]);	
+                    clientGameView.addMouseListener(clientGameView);
+                    clientGameView.addKeyListener(clientGameView);
+                    clientGameView.validate();
+                } catch (IOException ex) {
+                    Logger.getLogger(GameUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                if (!clientGameView.isShowing()){
+                    
+                }
+                
+                
+                
             }
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private static client.GameView clientGameView;
     private javax.swing.JPanel currentViewPanel;
     private javax.swing.JMenuItem fileExit;
     private javax.swing.JMenu fileMenuOption;
     private javax.swing.JMenuItem fileNewGame;
-    private client.GameView gameView1;
     private javax.swing.JPanel gameViewPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenuBar jMenuBar1;

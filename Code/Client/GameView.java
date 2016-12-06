@@ -76,7 +76,7 @@ public class GameView extends JPanel implements MouseMotionListener, MouseListen
             
             //todo
 		// BufferedReader f = new BufferedReader(new FileReader("englishWords.txt"));
-		BufferedReader f = new BufferedReader(new FileReader("Common English Words"));
+		BufferedReader f = new BufferedReader(new FileReader("C:\\Users\\Chris Mazur\\Documents\\NetBeansProjects\\COSC318 Project\\src\\client\\Common English Words"));
 		while(true){
 			String word = f.readLine();
 			if(word==null){
@@ -173,7 +173,7 @@ public class GameView extends JPanel implements MouseMotionListener, MouseListen
 		String disThing = String.valueOf(k);
 		g.setColor(color);
 		g.drawString(disThing, (int)(xStart+j*xss*7.0/11/word_starts[0].length)+15, yStart+(int)(i*yss*7.0/11/word_starts[0].length)+20);
-		System.out.println("testo");
+		//System.out.println("testo");
 	}
 	
 	public static void fillBox(int i, int j, Graphics2D g, Color color){
@@ -230,18 +230,18 @@ public class GameView extends JPanel implements MouseMotionListener, MouseListen
 
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				JFrame frame = new JFrame();
-				frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				frame.setVisible(true);
-				frame.setSize(xss, yss);
+				//JFrame frame = new JFrame();
+				//frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+				//frame.setVisible(true);
+				//frame.setSize(xss, yss);
 				
-				GameView game = new GameView();
-				frame.add(game);
+				//GameView game = new GameView();
+				//frame.add(game);
 				
-				game.addMouseListener(game);
-				frame.addKeyListener(game);
+				//game.addMouseListener(game);
+				//frame.addKeyListener(game);
 
-				frame.validate();
+				//frame.validate();
 			}
 		});
 		

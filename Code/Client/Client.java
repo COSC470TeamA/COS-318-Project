@@ -7,8 +7,12 @@ package client;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,22 +39,24 @@ public class Client {
     FileInputStream fromFile = null;
     BufferedOutputStream nOut = null;
     BufferedInputStream nIn = null;
+    GameView gameView;
     
     private Socket server;
     
     private GameUI game;
     
-    
-    
-    public static void main (String[] args){
-        
-        
-        
+    public Client (){
+        //on construction, connect to the server
+        try {
+            server = new Socket("localhost", 4445);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         
         
     }
-    
-    
     
 }
