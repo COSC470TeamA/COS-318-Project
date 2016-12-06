@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package server;
+package Server;
 
 /**
  *
@@ -244,9 +244,9 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 		
 		int cols = (int)(Math.random() * 5) + 5;
 		boolean hasLetter[][] = new boolean [cols][cols];
-		boolean alternating = false;
+		boolean alternating = true;
 		Random random = new Random();
-		
+		int weight = 0;
 		
 		
 		for (int i = 0; i < cols; i++){
@@ -257,7 +257,17 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 			      boolean tmp = hasLetter[swapRow][swapCol];
 			      hasLetter[swapRow][swapCol] = alternating;
 			      hasLetter[i][j] = tmp;
+                              if (weight < 2){
+                                  weight ++;
+                              }
+                              else if (weight == 2){
 			      alternating = !alternating;
+                              weight ++;
+                              }
+                              else if (weight == 3){
+                                  alternating = !alternating;
+                                  weight = 0;
+                              }
 			      System.out.println(alternating);
 				}
 			}
@@ -335,6 +345,7 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 		for (int i = 0; i < word_start_list.size(); i++) {
 			System.out.println("Counts[" + i + "]: " + counts.get(i));
 		}
+                fillSpace(mem_board, mem_pos);
 	}
 
 	static int findWordLength(int[][] word_starts, int i, int j,
@@ -453,6 +464,15 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 			System.out.println();
 		}
 	}
+        
+        private static void fillSpace(char[][] board, char[][] pos){
+            for(int i = 0; i < word_starts.length; i++){
+                for(int j = 0; j < word_starts.length; j++){
+                    if (board[i][j] == 0)
+                    word_starts[i][j] = -1;
+                }
+            }
+        }
 
 	static void printStarts(int[][] word_starts) {
 		for (int i = 0; i < word_starts.length; i++) {
