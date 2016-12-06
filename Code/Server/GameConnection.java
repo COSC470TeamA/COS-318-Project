@@ -44,6 +44,7 @@ public class GameConnection implements Runnable {
     private Socket client;
     private GameState gs;
     private Game game;
+    int _BOARD_SIZE = 5;
 
     public GameConnection(Socket client, int currentConnections) {
         this.client = client;
@@ -83,7 +84,7 @@ public class GameConnection implements Runnable {
 
                 clearBuf();
                 updateBufferFromServerPacketHeader(buffer);
-                
+
                 sendGameData();
 
             }
@@ -93,27 +94,33 @@ public class GameConnection implements Runnable {
     }
 
     public void signalUpdate(byte[] buf) {
-
-        //not our turn, sit and spin
-        while (Server.canUpdate[_LOBBY_SELECTION] != (byte) _THIS_CONNECTION) {
-            //notify need of turn
-            if (Server.notify[_LOBBY_SELECTION] != 1) {
-                Server.canUpdate[_LOBBY_SELECTION] = (byte) _THIS_CONNECTION;
+        boolean updating = true;
+        while (updating) {
+            //not our turn, sit and spin
+            while (Server.canUpdate[_LOBBY_SELECTION] != (byte) _THIS_CONNECTION) {
+                //notify need of turn
+                if (Server.notify[_LOBBY_SELECTION] != 1) {
+                    Server.canUpdate[_LOBBY_SELECTION] = (byte) _THIS_CONNECTION;
+                }
             }
-        }
-        //claim mutex
-        if (Server.notify[_LOBBY_SELECTION] != 1) {
-            Server.notify[_LOBBY_SELECTION] = 1;
-            
-            //Perform changes on gamestate
+            //claim mutex
+            if (Server.notify[_LOBBY_SELECTION] != 1) {
+                Server.notify[_LOBBY_SELECTION] = 1;
 
-            Server.xCoord[_LOBBY_SELECTION] = buffer[_OFFSET];
-            Server.yCoord[_LOBBY_SELECTION] = buffer[_OFFSET + 1];
-            Server.charVal[_LOBBY_SELECTION] = Byte.toString(buffer[_OFFSET + 3]).charAt(0);
-            game.insertChar(Server.xCoord[_LOBBY_SELECTION], Server.yCoord[_LOBBY_SELECTION], Server.charVal[_LOBBY_SELECTION]);
-            
-            //release mutex
-            Server.notify[_LOBBY_SELECTION] = 0;
+                //Perform changes on gamestate
+                Server.xCoord[_LOBBY_SELECTION] = buffer[_OFFSET]; //byte after header = x
+                Server.yCoord[_LOBBY_SELECTION] = buffer[_OFFSET + 1]; //byte after x = y;
+                Server.charVal[_LOBBY_SELECTION] = Byte.toString(buffer[_OFFSET + 3]).charAt(0); //charvalue
+
+                //update the game from the server's gamestate
+                game.insertChar(Server.xCoord[_LOBBY_SELECTION],
+                        Server.yCoord[_LOBBY_SELECTION],
+                        Server.charVal[_LOBBY_SELECTION]);
+
+                //release mutex
+                Server.notify[_LOBBY_SELECTION] = 0;
+            }
+            updating = false;
         }
     }
 
@@ -181,30 +188,46 @@ public class GameConnection implements Runnable {
 
 
         //Give the connection a hadle to the lobby's gamestate
-        gs = Server.gs[_LOBBY_SELECTION];
-        game = Server.games[_LOBBY_SELECTION];
+        this.gs = Server.gs[_LOBBY_SELECTION];
+        this.game = Server.games[_LOBBY_SELECTION];
 
         //add the player's name to the gamestate
-        gs._PLAYERS_IN_LOBBY[_SERVER_PACKET_HEADER[5]] = _PLAYER_NAME;
+        this.gs._PLAYERS_IN_LOBBY[_SERVER_PACKET_HEADER[5]] = _PLAYER_NAME;
     }
 
     private void sendGameData() {
+        String mem_posString;
+
         clearBuf();
+
         _SERVER_PACKET_HEADER[0] = 30; //sending game data
         updateBufferFromServerPacketHeader(buffer);
 
         byte[] buf = new byte[_SEGMENT_SIZE];
-        buf = game.mem_pos.toBytes();
 
         //From 0 to the beginning of player name, in SIZE-sized segments
-        for (int i = 0; i < ((_NAME_OFFSET - _OFFSET) / _SEGMENT_SIZE); i++) {
-            int curSegment = _OFFSET + (i * _SEGMENT_SIZE);
-            for (int j = 0; j < _SEGMENT_SIZE; j++) {
-                //load into the buffer the current row or whatever with 1 space in between each delineation
-                //buffer[curSegment + j] = (byte) gameData[curSegment + j]
-                //Might need mapping? That's fine.
+        for (int i = 0; i < ((_NAME_OFFSET - _OFFSET) / _BOARD_SIZE); i++) { //defaulted to 5 right now
+            buf = new byte[_SEGMENT_SIZE]; //clear buf
+            mem_posString = new String(game.mem_pos[i].toString()); //get row i as string
+            buf = mem_posString.getBytes(); //insert into appropriate area as byte[]
+            int z = (_OFFSET + (i * _SEGMENT_SIZE)); //current segment byte; 
+            
+            //load the buf-string into the buffer at the current segment 
+            for (int j = 0; j < buf.length; j++) {
+                buffer[z] = buf[j]; //load into buffer beginning at offset
+                z++; //increment current segment byte
             }
         }
+        
+        //Send to Client
+        try {
+            nOut.write(buffer);
+        } catch (IOException ex) {
+            Logger.getLogger(GameConnection.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
     }
 
     private void updateBufferFromServerPacketHeader(byte[] buf) {
