@@ -322,6 +322,7 @@ public class WordStarts extends JPanel implements MouseMotionListener, MouseList
 		for (int i = 0; i < word_start_list.size(); i++) {
 			System.out.println("Counts[" + i + "]: " + counts.get(i));
 		}
+		fillSpace(mem_board, mem_pos);
 	}
 
 	static int findWordLength(int[][] word_starts, int i, int j,
@@ -438,6 +439,15 @@ public class WordStarts extends JPanel implements MouseMotionListener, MouseList
 			System.out.println();
 		}
 	}
+	
+	private static void fillSpace(char[][] board, char[][] pos){
+            for(int i = 0; i < word_starts.length; i++){
+                for(int j = 0; j < word_starts.length; j++){
+                    if (board[i][j] == 0)
+                    word_starts[i][j] = -1;
+                }
+            }
+        }
 
 	static void printStarts(int[][] word_starts) {
 		for (int i = 0; i < word_starts.length; i++) {
