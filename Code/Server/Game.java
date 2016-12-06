@@ -166,11 +166,13 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 		char k = mem_pos[i][j];
 		int xStart =xss*2/11;
 		int yStart =yss*2/11;
-		System.out.println(k);
+		//System.out.println(k);
 		String disThing = String.valueOf(k);
 		g.setColor(color);
-		g.drawString(disThing, (int)(xStart+j*xss*7.0/11/word_starts[0].length)+15, yStart+(int)(i*yss*7.0/11/word_starts[0].length)+20);
-		System.out.println("testo");
+                Font f = new Font("Arial", Font.PLAIN, 18);
+		g.setFont(f);
+		g.drawString(disThing, (int)(xStart+j*xss*7.0/11/word_starts[0].length)+15, yStart+(int)(i*yss*7.0/11/word_starts[0].length)+25);
+		//System.out.println("testo");
 	}
 	
 	public static void fillBox(int i, int j, Graphics2D g, Color color){
@@ -268,7 +270,7 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
                                   alternating = !alternating;
                                   weight = 0;
                               }
-			      System.out.println(alternating);
+			      //System.out.println(alternating);
 				}
 			}
 
