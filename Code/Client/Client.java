@@ -36,7 +36,7 @@ public class Client {
     boolean updateFromServer = false, updateFromClient = false;
     byte[] updateBuffer = new byte[_BUF_SIZE];
     byte[] buffer = new byte[_BUF_SIZE];
-    FileInputStream fromFile = null;
+    byte state;
     BufferedOutputStream nOut = null;
     BufferedInputStream nIn = null;
     GameView gameView;
@@ -49,6 +49,11 @@ public class Client {
         //on construction, connect to the server
         try {
             server = new Socket("localhost", 4445);
+            
+            
+            
+            
+            
         } catch (UnknownHostException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -57,6 +62,23 @@ public class Client {
         
         
         
+        
+        
+        
+    }
+    
+    
+    
+    public int clientWrite(byte[] buf){
+        
+        
+        
+        return 0;
+    }
+    
+    public byte[] clientRead(byte stateByte){
+        byte[] buf = new byte[_BUF_SIZE];
+        return buf;
     }
     
 }
