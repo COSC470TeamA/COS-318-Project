@@ -39,7 +39,7 @@ public class Client {
     byte state;
     BufferedOutputStream nOut = null;
     BufferedInputStream nIn = null;
-    GameView gameView;
+    
     
     private Socket server;
     

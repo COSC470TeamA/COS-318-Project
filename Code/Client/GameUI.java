@@ -4,22 +4,73 @@
  */
 package client;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.font.LineMetrics;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
  * @author Chris Mazur
  */
+class WordStart {
+
+    public WordStart(int i, int j, boolean is_across, int length) {
+        this.i = i;
+        this.j = j;
+        this.is_across = is_across;
+        this.length = length;
+    }
+    int i;
+    int j;
+    boolean is_across; // if false, this is a down start
+    int length;
+}
+
 public class GameUI extends javax.swing.JFrame {
+
+    public static void loadWords() throws IOException {
+        // BufferedReader f = new BufferedReader(new FileReader("englishWords.txt"));
+        BufferedReader f = new BufferedReader(new FileReader("C:\\Users\\Chris Mazur\\Documents\\NetBeansProjects\\COSC318 Project\\src\\client\\Common English Words"));
+        while (true) {
+            String word = f.readLine();
+            if (word == null) {
+                break;
+            }
+            words.add(word);
+        }
+    }
+
+    public static void paintComponent(Graphics oldg) {
+        Graphics2D g = (Graphics2D) oldg;
+        g.setRenderingHint(
+                RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(Color.white);
+        g.fillRect(0, 0, 1000, 1000);
+
+        if (word_starts == null) {
+            return;
+        }
+
+        g.setColor(Color.black);
+        graphics(g);
+        drawOutline(g);
+    }
 
     /**
      * Creates new form GameUI
      */
     public GameUI() {
         initComponents();
-        
+
     }
 
     /**
@@ -53,7 +104,6 @@ public class GameUI extends javax.swing.JFrame {
         playersInLobby7 = new javax.swing.JLabel();
         playersInLobby8 = new javax.swing.JLabel();
         gameViewPanel = new javax.swing.JPanel();
-        clientGameView = new client.GameView();
         jMenuBar1 = new javax.swing.JMenuBar();
         fileMenuOption = new javax.swing.JMenu();
         fileNewGame = new javax.swing.JMenuItem();
@@ -120,7 +170,7 @@ public class GameUI extends javax.swing.JFrame {
             .addGroup(lobbyPanelLayout.createSequentialGroup()
                 .addGroup(lobbyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(lobbyPanelLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(0, 55, Short.MAX_VALUE)
                         .addComponent(joinSelectedLobbyButton))
                     .addGroup(lobbyPanelLayout.createSequentialGroup()
                         .addContainerGap()
@@ -196,42 +246,32 @@ public class GameUI extends javax.swing.JFrame {
                 .addGroup(lobbyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(radioJoinLobby8)
                     .addComponent(playersInLobby8))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 254, Short.MAX_VALUE)
                 .addComponent(joinSelectedLobbyButton)
                 .addContainerGap())
         );
 
-        gameViewPanel.setBackground(new java.awt.Color(140, 140, 140));
-        gameViewPanel.setPreferredSize(new java.awt.Dimension(280, 249));
-
-        clientGameView.setBorder(new javax.swing.border.MatteBorder(null));
-
-        javax.swing.GroupLayout clientGameViewLayout = new javax.swing.GroupLayout(clientGameView);
-        clientGameView.setLayout(clientGameViewLayout);
-        clientGameViewLayout.setHorizontalGroup(
-            clientGameViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 428, Short.MAX_VALUE)
-        );
-        clientGameViewLayout.setVerticalGroup(
-            clientGameViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
+        gameViewPanel.setFocusCycleRoot(true);
+        gameViewPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                gameViewPanelMouseClicked(evt);
+            }
+        });
+        gameViewPanel.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                gameViewPanelKeyTyped(evt);
+            }
+        });
 
         javax.swing.GroupLayout gameViewPanelLayout = new javax.swing.GroupLayout(gameViewPanel);
         gameViewPanel.setLayout(gameViewPanelLayout);
         gameViewPanelLayout.setHorizontalGroup(
             gameViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(gameViewPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(clientGameView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGap(0, 500, Short.MAX_VALUE)
         );
         gameViewPanelLayout.setVerticalGroup(
             gameViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(gameViewPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(clientGameView, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGap(0, 500, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout currentViewPanelLayout = new javax.swing.GroupLayout(currentViewPanel);
@@ -240,8 +280,8 @@ public class GameUI extends javax.swing.JFrame {
             currentViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(currentViewPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(gameViewPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(gameViewPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lobbyPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -250,8 +290,8 @@ public class GameUI extends javax.swing.JFrame {
             .addGroup(currentViewPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(currentViewPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(lobbyPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(gameViewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 387, Short.MAX_VALUE))
+                    .addComponent(gameViewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lobbyPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -278,17 +318,17 @@ public class GameUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(currentViewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(currentViewPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(currentViewPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(currentViewPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         getAccessibleContext().setAccessibleDescription("");
@@ -303,6 +343,33 @@ public class GameUI extends javax.swing.JFrame {
     private void joinSelectedLobbyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinSelectedLobbyButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_joinSelectedLobbyButtonActionPerformed
+
+    private void gameViewPanelKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_gameViewPanelKeyTyped
+        // TODO add your handling code here:
+        System.out.println("You pressed " + evt.getKeyChar());
+        lastKeyPressed = evt.getKeyChar();
+
+        repaint();
+    }//GEN-LAST:event_gameViewPanelKeyTyped
+
+    private void gameViewPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_gameViewPanelMouseClicked
+        // TODO add your handling code here:
+        System.out.println("Mouse clicked at " + evt.getX() + ", " + evt.getY());
+        int squareSize = (int) (7.0 / 11 * xss / word_starts[0].length);
+        int xStart = xss * 2 / 11;
+        int yStart = yss * 2 / 11;
+        int i = (evt.getY() - yStart) / squareSize;
+        int j = (evt.getX() - xStart) / squareSize;
+
+        if (evt.getY() >= yStart && evt.getX() >= xStart
+                && i < word_starts.length && j < word_starts[0].length) {
+            System.out.println("Click at row " + i + ", col " + j);
+            xHighlight = xCurrSquare = i;
+            yHighlight = yCurrSquare = j;
+        }
+
+        repaint();
+    }//GEN-LAST:event_gameViewPanelMouseClicked
 
     /**
      * @param args the command line arguments
@@ -330,42 +397,131 @@ public class GameUI extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(GameUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+        try {
+            loadWords();
+        } catch (Exception e) {
+        }
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                
+
                 new GameUI().setVisible(true);
-                Client client = new Client();
-                clientGameView = client.gameView;
-                
-                
-                try {
-                    clientGameView.main(new String[2]);	
-                    clientGameView.addMouseListener(clientGameView);
-                    clientGameView.addKeyListener(clientGameView);
-                    clientGameView.validate();
-                } catch (IOException ex) {
-                    Logger.getLogger(GameUI.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                if (!clientGameView.isShowing()){
-                    
-                }
-                
-                
+                gameViewPanel.validate();
+                init();
                 
             }
         });
     }
+
+    public static void init() {
+        int cols = 6; //(int) (Math.random() * 5) + 5;
+        boolean hasLetter[][] = new boolean[cols][cols];
+        boolean alternating = true;
+        Random random = new Random();
+        int weight = 0;
+
+
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < cols; j++) {
+                int k = random.nextInt(i * cols + j + 1);
+                int swapRow = k / cols;
+                int swapCol = k % cols;
+                boolean tmp = hasLetter[swapRow][swapCol];
+                hasLetter[swapRow][swapCol] = alternating;
+                hasLetter[i][j] = tmp;
+                if (weight < 2) {
+                    weight++;
+                } else if (weight == 2) {
+                    alternating = !alternating;
+                    weight++;
+                } else if (weight == 3) {
+                    alternating = !alternating;
+                    weight = 0;
+                }
+            }
+        }
+
+
+        word_starts = new int[hasLetter.length][hasLetter.length];
+        char board[][] = new char[hasLetter.length][hasLetter.length];
+        updatePublicBoard(board);
+        mem_pos = new char[hasLetter.length][hasLetter.length];
+
+
+        for (int i = 0; i < word_starts.length; i++) {
+            for (int j = 0; j < word_starts[0].length; j++) {
+                if (hasLetter[i][j] == false) {
+                    word_starts[i][j] = WALL;
+                } else {
+                    word_starts[i][j] = BLANK;
+                }
+            }
+        }
+        for (int i = 0; i < word_starts.length; i++) {
+            for (int j = 0; j < word_starts[0].length; j++) {
+                int thing = 0;
+                if (hasLetter[i][j] == false) {
+                    continue;
+                }
+                if ((i == 0 || hasLetter[i - 1][j] == false) && // there is a wall above us AND
+                        (i < 4 && hasLetter[i + 1][j] == true)) { // no wall below us
+                    word_starts[i][j] = DOWN;
+                    thing++;
+                }
+                if ((j == 0 || hasLetter[i][j - 1] == false)
+                        && (j < 4 && hasLetter[i][j + 1] == true)) {
+                    if (thing == 1) {
+                        word_starts[i][j] = BOTH;
+                    } else {
+                        word_starts[i][j] = ACROSS;
+                    }
+                }
+            }
+        }
+
+        System.out.println("Word starts:");
+        printStarts(word_starts);
+        System.out.println();
+
+        ArrayList<WordStart> word_start_list = new ArrayList<WordStart>();
+        for (int i = 0; i < word_starts.length; i++) {
+            for (int j = 0; j < word_starts[0].length; j++) {
+                if (word_starts[i][j] == ACROSS || word_starts[i][j] == BOTH) {
+                    word_start_list.add(new WordStart(i, j, true, findWordLength(word_starts, i, j, true)));
+                }
+                if (word_starts[i][j] == DOWN || word_starts[i][j] == BOTH) {
+                    word_start_list.add(new WordStart(i, j, false, findWordLength(word_starts, i, j, false)));
+                }
+            }
+        }
+
+        counts = new ArrayList<Integer>();
+        for (int i = 0; i < word_start_list.size(); i++) {
+            counts.add(0);
+        }
+
+        if (tryToSolve(word_start_list, board, 0)) {
+            System.out.println("Solution:");
+            printSolution(word_starts, board);
+            System.out.println();
+            mem_board = board;
+            updatePublicBoard(board);
+        } else {
+            System.out.println("NO SOLUTION FOUND");
+        }
+
+        for (int i = 0; i < word_start_list.size(); i++) {
+            System.out.println("Counts[" + i + "]: " + counts.get(i));
+        }
+        fillSpace(mem_board, mem_pos);
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private static client.GameView clientGameView;
-    private javax.swing.JPanel currentViewPanel;
+    private static javax.swing.JPanel currentViewPanel;
     private javax.swing.JMenuItem fileExit;
     private javax.swing.JMenu fileMenuOption;
     private javax.swing.JMenuItem fileNewGame;
-    private javax.swing.JPanel gameViewPanel;
+    static javax.swing.JPanel gameViewPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JButton joinSelectedLobbyButton;
@@ -387,4 +543,298 @@ public class GameUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton radioJoinLobby7;
     private javax.swing.JRadioButton radioJoinLobby8;
     // End of variables declaration//GEN-END:variables
+//Beginning of Game variables declaration
+    static int xHighlight = 0;
+    static int yHighlight = 0;
+    static int xCurrSquare = 0;
+    static int yCurrSquare = 0;
+    static char lastKeyPressed = 0;
+    static int xss = 500; //xss = x screen size
+    static int yss = 500; //yss = y screen size
+    static int word_starts[][];
+    static char mem_board[][];
+    static char mem_pos[][];
+    static char public_board[][];
+    static final int WALL = -1;
+    static final int BLANK = 0;
+    static final int ACROSS = 1;
+    static final int DOWN = 2;
+    static final int BOTH = 3;
+    static ArrayList<String> wordsUsed = new ArrayList<String>();
+    static ArrayList<String> words = new ArrayList<String>();
+    static ArrayList<Integer> counts = new ArrayList<Integer>();
+
+    public static void insertChar(int i, int j, char k) {
+        mem_pos[i][j] = k;
+        lastKeyPressed = 0;
+    }
+
+    public static void drawChar(int i, int j, Graphics2D g, Color color) {
+        char k = mem_pos[i][j];
+        int xStart = xss * 2 / 11;
+        int yStart = yss * 2 / 11;
+        String disThing = String.valueOf(k);
+        System.out.println(disThing);
+        Font f = new Font("Arial", Font.PLAIN, 18);
+        g.setColor(color);
+        g.setFont(f);
+        g.drawString(disThing, (int) (xStart + j * xss * 7.0 / 11 / word_starts[0].length) + 15, yStart + (int) (i * yss * 7.0 / 11 / word_starts[0].length) + 25);
+    }
+
+    public static void fillBox(int i, int j, Graphics2D g, Color color) {
+        int xStart = xss * 2 / 11;
+        int yStart = yss * 2 / 11;
+        g.setColor(color);
+        g.fillRect((int) (xStart + j * xss * 7.0 / 11 / word_starts[0].length), yStart + (int) (i * yss * 7.0 / 11 / word_starts[0].length), (int) (7.0 / 11 * xss / word_starts[0].length), (int) (7.0 / 11 * yss / word_starts[0].length));
+    }
+
+    public static void drawBox(int i, int j, Graphics2D g, Color color) {
+        int xStart = xss * 2 / 11;
+        int yStart = yss * 2 / 11;
+        g.setColor(color);
+        g.drawRect((int) (xStart + j * xss * 7.0 / 11 / word_starts[0].length), yStart + (int) (i * yss * 7.0 / 11 / word_starts[0].length), (int) (7.0 / 11 * xss / word_starts[0].length), (int) (7.0 / 11 * yss / word_starts[0].length));
+    }
+
+    private static void graphics(Graphics2D g) {
+
+        Font f = new Font("Arial", Font.PLAIN, 12);
+        g.setFont(f);
+        int count = 0;
+        int xStart = xss * 2 / 11;
+        int yStart = yss * 2 / 11;
+        int highlighted_word_start = word_starts[xHighlight][yHighlight];
+        if (highlighted_word_start != BLANK
+                && highlighted_word_start != WALL) {
+            if (highlighted_word_start == BOTH) {
+                highlightWord(ACROSS, xHighlight, yHighlight, g);
+                highlightWord(DOWN, xHighlight, yHighlight, g);
+            } else {
+                highlightWord(highlighted_word_start, xHighlight, yHighlight, g);
+            }
+        }
+        if (lastKeyPressed != 0) {
+            System.out.println("Working...");
+            insertChar(xCurrSquare, yCurrSquare, lastKeyPressed);
+        }
+        g.setColor(Color.black);
+        for (int i = 0; i < word_starts.length; i++) {
+            for (int j = 0; j < word_starts[0].length; j++) {
+                if (word_starts[i][j] == WALL) {
+                    fillBox(i, j, g, Color.black);
+                } else if (word_starts[i][j] == BLANK) {
+                } else {
+                    count++;
+                    LineMetrics lm = f.getLineMetrics(".", g.getFontRenderContext());
+                    g.drawString(count + ".", (int) (2 + xStart + j * xss * 7.0 / 11 / word_starts[0].length), (int) (2 + lm.getAscent() + yStart + i * yss * 7.0 / 11 / word_starts[0].length));
+                }
+
+            }
+        }
+
+    }
+
+    public static void highlightWord(int dir, int i, int j, Graphics2D g) {
+        System.out.println("highlightWord " + dir + " i " + i + " j " + j);
+        boolean is_across = false;
+        if (dir == ACROSS) {
+            is_across = true;
+        }
+        if (dir == ACROSS || dir == DOWN) {
+            int len;
+            for (len = 1; len < word_starts.length; len++) {
+                if (is_across) {
+                    fillBox(i, j, g, Color.gray);
+                    j++;
+                } else {
+                    fillBox(i, j, g, Color.gray);
+                    i++;
+                }
+                if (i >= word_starts.length || j >= word_starts.length || word_starts[i][j] == WALL) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private static void drawOutline(Graphics2D g) {
+        // System.out.println("drawOutline");
+        int xStart = xss * 2 / 11;
+        int yStart = yss * 2 / 11;
+
+        for (int i = 0; i <= word_starts[0].length; i++) {
+            int x = (int) (xStart + 7.0 / 11 * xss * i / word_starts[0].length);
+            g.drawLine(x, yStart, x, (int) (yStart + yss * 7.0 / 11));
+        }
+        for (int j = 0; j <= word_starts[1].length; j++) {
+            int y = (int) (yStart + 7.0 / 11 * yss * j / word_starts[1].length);
+            g.drawLine(xStart, y, (int) (xStart + xss * 7.0 / 11), y);
+        }
+        for (int k = 0; k < word_starts.length; k++) {
+            for (int l = 0; l < word_starts.length; l++) {
+                drawChar(k, l, g, Color.black);
+            }
+        }
+        drawBox(xCurrSquare, yCurrSquare, g, Color.red);
+
+    }
+
+    static int findWordLength(int[][] word_starts, int i, int j,
+            boolean is_across) {
+        int len;
+        for (len = 1; len < word_starts.length; len++) {
+            if (is_across) {
+                j++;
+            } else {
+                i++;
+            }
+            if (i >= word_starts.length || j >= word_starts.length || word_starts[i][j] == WALL) {
+                break;
+            }
+        }
+        return len;
+    }
+
+    public static boolean tryToSolve(ArrayList<WordStart> word_starts, char[][] board, int cur_word_start) {
+        if (cur_word_start >= word_starts.size()) {
+            return true;
+        }
+
+        counts.set(cur_word_start, counts.get(cur_word_start) + 1);
+        WordStart ws = word_starts.get(cur_word_start);
+        //System.out.println("Finding a word for " + ws.i + ", " + ws.j + ", with length " + ws.length + " -- across? " + ws.is_across);
+
+        // Remember which characters in this word were already set
+        boolean had_letter[] = new boolean[ws.length];
+        for (int i = 0; i < ws.length; i++) {
+            had_letter[i] = true;
+        }
+        int r = ws.i;
+        int c = ws.j;
+        for (int i = 0; i < ws.length; i++) {
+            if (board[r][c] == 0) {
+                had_letter[i] = false;
+            }
+            if (ws.is_across) {
+                c++;
+            } else {
+                r++;
+            }
+        }
+
+        // Find a word that fits here, given the letters already on the board
+        for (int i = 0; i < words.size(); i++) {
+            String word = words.get(i);
+
+            if (!wordsUsed.contains(word) && word.length() == ws.length) {
+                boolean word_fits = true;
+                r = ws.i;
+                c = ws.j;
+                for (int j = 0; j < ws.length; j++) {
+                    if (board[r][c] != 0 && board[r][c] != word.charAt(j)) {
+                        word_fits = false;
+                        break;
+                    }
+                    if (ws.is_across) {
+                        c++;
+                    } else {
+                        r++;
+                    }
+                }
+
+                if (word_fits) {
+                    // Place this word on the board
+                    wordsUsed.add(word);
+                    r = ws.i;
+                    c = ws.j;
+                    for (int j = 0; j < ws.length; j++) {
+                        board[r][c] = word.charAt(j);
+                        updatePublicBoard(board);
+                        if (ws.is_across) {
+                            c++;
+                        } else {
+                            r++;
+                        }
+                    }
+
+                    // If puzzle can be solved this way, we're done
+                    if (tryToSolve(word_starts, board, cur_word_start + 1)) {
+                        return true;
+                    }
+
+                    // If not, take up letters that we placed and try a different word
+                    r = ws.i;
+                    c = ws.j;
+                    for (int j = 0; j < ws.length; j++) {
+                        if (!had_letter[j]) {
+                            board[r][c] = 0;
+                        }
+                        updatePublicBoard(board);
+                        if (ws.is_across) {
+                            c++;
+                        } else {
+                            r++;
+                        }
+                    }
+
+                    wordsUsed.remove(word);
+                }
+            }
+        }
+
+        // If no word can work, return false.
+        return false;
+
+    }
+
+    public static void printSolution(int[][] word_starts, char[][] board) {
+        for (int i = 0; i < word_starts.length; i++) {
+            for (int j = 0; j < word_starts[0].length; j++) {
+                int ws = word_starts[i][j];
+                if (ws == WALL) {
+                    System.out.print("_ ");
+                } else {
+                    System.out.print(board[i][j] + " ");
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    public static void fillSpace(char[][] board, char[][] pos) {
+        for (int i = 0; i < word_starts.length; i++) {
+            for (int j = 0; j < word_starts.length; j++) {
+                if (board[i][j] == 0) {
+                    word_starts[i][j] = WALL;
+                }
+            }
+        }
+    }
+
+    static void printStarts(int[][] word_starts) {
+        for (int i = 0; i < word_starts.length; i++) {
+            for (int j = 0; j < word_starts[0].length; j++) {
+                int ws = word_starts[i][j];
+                if (ws == WALL) {
+                    System.out.print("W ");
+                }
+                if (ws == BLANK) {
+                    System.out.print("  ");
+                }
+                if (ws == ACROSS) {
+                    System.out.print("- ");
+                }
+                if (ws == DOWN) {
+                    System.out.print("| ");
+                }
+                if (ws == BOTH) {
+                    System.out.print("+ ");
+                }
+            }
+            System.out.println();
+        }
+    }
+
+    static public void updatePublicBoard(char[][] board) {
+        public_board = board;
+    }
 }
