@@ -10,11 +10,17 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.font.LineMetrics;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -83,6 +89,11 @@ public class GameUI extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        enterIPAddressMenu = new javax.swing.JFrame();
+        ipAddrTextField = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        ipAddrOKButton = new javax.swing.JButton();
+        connectionNotifyWaiting = new javax.swing.JLabel();
         currentViewPanel = new javax.swing.JPanel();
         lobbyPanel = new javax.swing.JPanel();
         radioJoinLobby1 = new javax.swing.JRadioButton();
@@ -109,12 +120,81 @@ public class GameUI extends javax.swing.JFrame {
         fileNewGame = new javax.swing.JMenuItem();
         fileExit = new javax.swing.JMenuItem();
 
+        enterIPAddressMenu.setTitle("Enter Server IP Address");
+        enterIPAddressMenu.setAlwaysOnTop(true);
+        enterIPAddressMenu.setMinimumSize(new java.awt.Dimension(300, 150));
+        enterIPAddressMenu.setName("enterIPAddressMenuFrame"); // NOI18N
+        enterIPAddressMenu.setPreferredSize(new java.awt.Dimension(300, 150));
+
+        ipAddrTextField.setText("127.0.0.1");
+        ipAddrTextField.setName(""); // NOI18N
+
+        jLabel2.setText("IP Address: ");
+
+        ipAddrOKButton.setText("OK");
+        ipAddrOKButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ipAddrOKButtonMouseClicked(evt);
+            }
+        });
+        ipAddrOKButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ipAddrOKButtonActionPerformed(evt);
+            }
+        });
+
+        connectionNotifyWaiting.setText(" ");
+        connectionNotifyWaiting.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        javax.swing.GroupLayout enterIPAddressMenuLayout = new javax.swing.GroupLayout(enterIPAddressMenu.getContentPane());
+        enterIPAddressMenu.getContentPane().setLayout(enterIPAddressMenuLayout);
+        enterIPAddressMenuLayout.setHorizontalGroup(
+            enterIPAddressMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(enterIPAddressMenuLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel2)
+                .addGap(18, 18, 18)
+                .addGroup(enterIPAddressMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(enterIPAddressMenuLayout.createSequentialGroup()
+                        .addComponent(ipAddrTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(ipAddrOKButton))
+                    .addGroup(enterIPAddressMenuLayout.createSequentialGroup()
+                        .addComponent(connectionNotifyWaiting, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 89, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        enterIPAddressMenuLayout.setVerticalGroup(
+            enterIPAddressMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(enterIPAddressMenuLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(connectionNotifyWaiting, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 48, Short.MAX_VALUE)
+                .addGroup(enterIPAddressMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, enterIPAddressMenuLayout.createSequentialGroup()
+                        .addGroup(enterIPAddressMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(ipAddrTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2))
+                        .addGap(24, 24, 24))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, enterIPAddressMenuLayout.createSequentialGroup()
+                        .addComponent(ipAddrOKButton)
+                        .addContainerGap())))
+        );
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         currentViewPanel.setBackground(new java.awt.Color(200, 200, 200));
+        currentViewPanel.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                currentViewPanelKeyTyped(evt);
+            }
+        });
 
         buttonGroup1.add(radioJoinLobby1);
         radioJoinLobby1.setText("Join Lobby 1");
+        radioJoinLobby1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        radioJoinLobby1.setRequestFocusEnabled(false);
+        radioJoinLobby1.setRolloverEnabled(false);
 
         buttonGroup1.add(radioJoinLobby2);
         radioJoinLobby2.setText("Join Lobby 2");
@@ -252,6 +332,7 @@ public class GameUI extends javax.swing.JFrame {
         );
 
         gameViewPanel.setFocusCycleRoot(true);
+        gameViewPanel.setNextFocusableComponent(gameViewPanel);
         gameViewPanel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 gameViewPanelMouseClicked(evt);
@@ -338,6 +419,9 @@ public class GameUI extends javax.swing.JFrame {
 
     private void fileNewGameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileNewGameActionPerformed
         // TODO add your handling code here:
+        dispose();
+        client = new Client();
+        main(new String[]{"New Game"});
     }//GEN-LAST:event_fileNewGameActionPerformed
 
     private void joinSelectedLobbyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_joinSelectedLobbyButtonActionPerformed
@@ -348,13 +432,14 @@ public class GameUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         System.out.println("You pressed " + evt.getKeyChar());
         lastKeyPressed = evt.getKeyChar();
-
-        repaint();
+        client.charVal = lastKeyPressed;
+        paintComponent(gameViewPanel.getGraphics());
     }//GEN-LAST:event_gameViewPanelKeyTyped
 
     private void gameViewPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_gameViewPanelMouseClicked
         // TODO add your handling code here:
         System.out.println("Mouse clicked at " + evt.getX() + ", " + evt.getY());
+
         int squareSize = (int) (7.0 / 11 * xss / word_starts[0].length);
         int xStart = xss * 2 / 11;
         int yStart = yss * 2 / 11;
@@ -368,8 +453,28 @@ public class GameUI extends javax.swing.JFrame {
             yHighlight = yCurrSquare = j;
         }
 
-        repaint();
+        gameViewPanel.requestFocus();
+        paintComponent(gameViewPanel.getGraphics());
+        client.xCoord = j;
+        client.yCoord = j;
     }//GEN-LAST:event_gameViewPanelMouseClicked
+
+    private void currentViewPanelKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_currentViewPanelKeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_currentViewPanelKeyTyped
+
+    private void ipAddrOKButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ipAddrOKButtonActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ipAddrOKButtonActionPerformed
+
+    private void ipAddrOKButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ipAddrOKButtonMouseClicked
+        // TODO add your handling code here:
+        client._SERVER_ADDR = ipAddrTextField.getText();
+        enterIPAddressMenu.setVisible(false);
+        initialConnectionPause();
+
+
+    }//GEN-LAST:event_ipAddrOKButtonMouseClicked
 
     /**
      * @param args the command line arguments
@@ -397,6 +502,11 @@ public class GameUI extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(GameUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+
+
+
+
+
         try {
             loadWords();
         } catch (Exception e) {
@@ -404,16 +514,97 @@ public class GameUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-
-                new GameUI().setVisible(true);
-                gameViewPanel.validate();
+                client = new Client();
+                GameUI g = new GameUI();
+                g.setVisible(true);
+                g.setLocationRelativeTo(null);
+                gameViewPanel.setFocusable(true);
                 init();
-                
+
+                enterIPAddressMenu.setVisible(true);
+                enterIPAddressMenu.setLocationRelativeTo(null);
+
             }
         });
     }
 
+    public static void initialConnectionPause() {
+        try {
+
+            client.connect();
+            client.nIn = new BufferedInputStream(client.server.getInputStream());
+            client.buffer = new byte[client._BUF_SIZE];
+            client.nIn.read(client.buffer);
+            System.out.println("Client received lobby info from Connection #" + (int) client.buffer[1]);
+            setLobbies(client.buffer);
+
+        } catch (IOException ex) {
+        }
+    }
+
+    public static void setLobbies(byte[] buf) {
+        playersInLobby1.setText((int) buf[8] + "/ 8");
+        playersInLobby2.setText((int) buf[9] + "/ 8");
+        playersInLobby3.setText((int) buf[10] + "/ 8");
+        playersInLobby4.setText((int) buf[11] + "/ 8");
+        playersInLobby5.setText((int) buf[12] + "/ 8");
+        playersInLobby6.setText((int) buf[13] + "/ 8");
+        playersInLobby7.setText((int) buf[14] + "/ 8");
+        playersInLobby8.setText((int) buf[15] + "/ 8");
+    }
+
+    public void sendPacket() {
+        try {
+            client.nOut = new BufferedOutputStream(client.server.getOutputStream());
+
+
+
+
+        } catch (IOException ex) {
+            Logger.getLogger(GameUI.class
+                    .getName()).log(Level.SEVERE, null, ex);
+        }
+
+        String mem_posString;
+
+        client._CLIENT_PACKET_HEADER[0] = 30; //sending game data
+
+        client.updateBufferFromClientPacketHeader(client.buffer);
+
+        byte[] buf = new byte[client._SEGMENT_SIZE];
+
+        //From 0 to the beginning of player name, in SIZE-sized segments
+
+        for (int i = 0; i < ((client._NAME_OFFSET - client._OFFSET) / 6); i++) { //defaulted to 6 right now
+
+            buf = new byte[client._SEGMENT_SIZE]; //clear buf
+
+            mem_posString = new String(mem_pos[i].toString()); //get row i as string
+
+            buf = mem_posString.getBytes(); //insert into appropriate area as byte[]
+
+            int z = (client._OFFSET + (i * client._SEGMENT_SIZE)); //current segment byte; 
+
+            //load the buf-string into the buffer at the current segment 
+            for (int j = 0; j < buf.length; j++) {
+                client.buffer[z] = buf[j]; //load into buffer beginning at offset
+                z++; //increment current segment byte
+            }
+        }
+
+        //Send to Server
+        try {
+            client.nOut.write(client.buffer);
+            client.nOut.flush();
+            client.nOut.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+    }
+
     public static void init() {
+        paintComponent(gameViewPanel.getGraphics());
         int cols = 6; //(int) (Math.random() * 5) + 5;
         boolean hasLetter[][] = new boolean[cols][cols];
         boolean alternating = true;
@@ -481,8 +672,6 @@ public class GameUI extends javax.swing.JFrame {
 
         System.out.println("Word starts:");
         printStarts(word_starts);
-        System.out.println();
-
         ArrayList<WordStart> word_start_list = new ArrayList<WordStart>();
         for (int i = 0; i < word_starts.length; i++) {
             for (int j = 0; j < word_starts[0].length; j++) {
@@ -503,7 +692,6 @@ public class GameUI extends javax.swing.JFrame {
         if (tryToSolve(word_start_list, board, 0)) {
             System.out.println("Solution:");
             printSolution(word_starts, board);
-            System.out.println();
             mem_board = board;
             updatePublicBoard(board);
         } else {
@@ -517,23 +705,28 @@ public class GameUI extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private static javax.swing.JLabel connectionNotifyWaiting;
     private static javax.swing.JPanel currentViewPanel;
+    private static javax.swing.JFrame enterIPAddressMenu;
     private javax.swing.JMenuItem fileExit;
     private javax.swing.JMenu fileMenuOption;
     private javax.swing.JMenuItem fileNewGame;
     static javax.swing.JPanel gameViewPanel;
-    private javax.swing.JLabel jLabel1;
+    private static javax.swing.JButton ipAddrOKButton;
+    private static javax.swing.JTextField ipAddrTextField;
+    private static javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JButton joinSelectedLobbyButton;
     private javax.swing.JPanel lobbyPanel;
-    private javax.swing.JLabel playersInLobby1;
-    private javax.swing.JLabel playersInLobby2;
-    private javax.swing.JLabel playersInLobby3;
-    private javax.swing.JLabel playersInLobby4;
-    private javax.swing.JLabel playersInLobby5;
-    private javax.swing.JLabel playersInLobby6;
-    private javax.swing.JLabel playersInLobby7;
-    private javax.swing.JLabel playersInLobby8;
+    private static javax.swing.JLabel playersInLobby1;
+    private static javax.swing.JLabel playersInLobby2;
+    private static javax.swing.JLabel playersInLobby3;
+    private static javax.swing.JLabel playersInLobby4;
+    private static javax.swing.JLabel playersInLobby5;
+    private static javax.swing.JLabel playersInLobby6;
+    private static javax.swing.JLabel playersInLobby7;
+    private static javax.swing.JLabel playersInLobby8;
     private javax.swing.JRadioButton radioJoinLobby1;
     private javax.swing.JRadioButton radioJoinLobby2;
     private javax.swing.JRadioButton radioJoinLobby3;
@@ -549,6 +742,7 @@ public class GameUI extends javax.swing.JFrame {
     static int xCurrSquare = 0;
     static int yCurrSquare = 0;
     static char lastKeyPressed = 0;
+    static Client client;
     static int xss = 500; //xss = x screen size
     static int yss = 500; //yss = y screen size
     static int word_starts[][];
@@ -567,6 +761,7 @@ public class GameUI extends javax.swing.JFrame {
     public static void insertChar(int i, int j, char k) {
         mem_pos[i][j] = k;
         lastKeyPressed = 0;
+
     }
 
     public static void drawChar(int i, int j, Graphics2D g, Color color) {
@@ -615,6 +810,7 @@ public class GameUI extends javax.swing.JFrame {
         if (lastKeyPressed != 0) {
             System.out.println("Working...");
             insertChar(xCurrSquare, yCurrSquare, lastKeyPressed);
+            paintComponent(gameViewPanel.getGraphics());
         }
         g.setColor(Color.black);
         for (int i = 0; i < word_starts.length; i++) {
@@ -627,7 +823,6 @@ public class GameUI extends javax.swing.JFrame {
                     LineMetrics lm = f.getLineMetrics(".", g.getFontRenderContext());
                     g.drawString(count + ".", (int) (2 + xStart + j * xss * 7.0 / 11 / word_starts[0].length), (int) (2 + lm.getAscent() + yStart + i * yss * 7.0 / 11 / word_starts[0].length));
                 }
-
             }
         }
 
@@ -657,7 +852,6 @@ public class GameUI extends javax.swing.JFrame {
     }
 
     private static void drawOutline(Graphics2D g) {
-        // System.out.println("drawOutline");
         int xStart = xss * 2 / 11;
         int yStart = yss * 2 / 11;
 
@@ -701,7 +895,6 @@ public class GameUI extends javax.swing.JFrame {
 
         counts.set(cur_word_start, counts.get(cur_word_start) + 1);
         WordStart ws = word_starts.get(cur_word_start);
-        //System.out.println("Finding a word for " + ws.i + ", " + ws.j + ", with length " + ws.length + " -- across? " + ws.is_across);
 
         // Remember which characters in this word were already set
         boolean had_letter[] = new boolean[ws.length];
@@ -796,11 +989,11 @@ public class GameUI extends javax.swing.JFrame {
                     System.out.print(board[i][j] + " ");
                 }
             }
-            System.out.println();
         }
     }
 
     public static void fillSpace(char[][] board, char[][] pos) {
+        paintComponent(gameViewPanel.getGraphics());
         for (int i = 0; i < word_starts.length; i++) {
             for (int j = 0; j < word_starts.length; j++) {
                 if (board[i][j] == 0) {
@@ -811,6 +1004,7 @@ public class GameUI extends javax.swing.JFrame {
     }
 
     static void printStarts(int[][] word_starts) {
+        paintComponent(gameViewPanel.getGraphics());
         for (int i = 0; i < word_starts.length; i++) {
             for (int j = 0; j < word_starts[0].length; j++) {
                 int ws = word_starts[i][j];
@@ -830,7 +1024,6 @@ public class GameUI extends javax.swing.JFrame {
                     System.out.print("+ ");
                 }
             }
-            System.out.println();
         }
     }
 

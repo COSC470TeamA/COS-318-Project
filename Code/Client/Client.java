@@ -6,7 +6,6 @@ package client;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -19,6 +18,7 @@ import java.util.logging.Logger;
  * @author Chris Mazur
  */
 public class Client {
+
     final int _BUF_SIZE = 1024;
     final int _NAME_SIZE = 254;
     final int _NAME_OFFSET = (_BUF_SIZE - _NAME_SIZE);
@@ -29,8 +29,8 @@ public class Client {
     byte[] _SERVER_PACKET_HEADER = new byte[_OFFSET];
     byte[] _CURRENT_LOBBIES_HEADER = new byte[_OFFSET];
     byte[] _PLAYER_NAME = new byte[_NAME_SIZE];
-    InetAddress _SERVER_ADDR;
-    int _SERVER_PORT;
+    String _SERVER_ADDR;
+    int _SERVER_PORT = 4445;
     int _SEGMENT_SIZE = 254;
     String line;
     boolean updateFromServer = false, updateFromClient = false;
@@ -39,46 +39,32 @@ public class Client {
     byte state;
     BufferedOutputStream nOut = null;
     BufferedInputStream nIn = null;
-    
-    
-    private Socket server;
-    
+    static Socket server;
     private GameUI game;
+    static int xCoord, yCoord;
+    static char charVal;
+    static char[] rowVal = new char[6];
     
-    public Client (){
-        //on construction, connect to the server
+
+    public Client() {
+    }
+
+    //connect to the server
+    public void connect() {
         try {
-            server = new Socket("localhost", 4445);
-            
-            
-            
-            
-            
+            server = new Socket(_SERVER_ADDR, _SERVER_PORT);
         } catch (UnknownHostException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
             Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-        
-        
-        
-        
     }
-    
-    
-    
-    public int clientWrite(byte[] buf){
+
         
-        
-        
-        return 0;
+    public void updateBufferFromClientPacketHeader(byte[] buf) {
+        //before we send a packet, canUpdate it with our server packet header
+        for (int i = 0; i < _OFFSET; i++) {
+            buf[i] = _CLIENT_PACKET_HEADER[i];
+        }
     }
-    
-    public byte[] clientRead(byte stateByte){
-        byte[] buf = new byte[_BUF_SIZE];
-        return buf;
-    }
-    
 }
