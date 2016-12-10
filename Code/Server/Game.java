@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package Server;
+package server;
 
 /**
  *
@@ -73,7 +73,7 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 	
 	public static void loadWords() throws IOException {
 		// BufferedReader f = new BufferedReader(new FileReader("englishWords.txt"));
-		BufferedReader f = new BufferedReader(new FileReader("Common English Words"));
+		BufferedReader f = new BufferedReader(new FileReader("C:\\Users\\Chris Mazur\\Documents\\NetBeansProjects\\COSC318 Project\\src\\client\\Common English Words"));
 		while(true){
 			String word = f.readLine();
 			if(word==null){
@@ -98,8 +98,6 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 		g.setColor(Color.black);
 		graphics(g);
 		drawOutline(g);
-		
-
 	}
 
 	

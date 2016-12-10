@@ -42,9 +42,9 @@ public class GameConnection implements Runnable {
     BufferedOutputStream nOut = null;
     BufferedInputStream nIn = null;
     private Socket client;
-    private GameState gs;
+    private GameLobby gs;
     private Game game;
-    int _BOARD_SIZE = 5;
+    int _BOARD_SIZE = 6;
 
     public GameConnection(Socket client, int currentConnections) {
         this.client = client;
@@ -65,6 +65,7 @@ public class GameConnection implements Runnable {
     }
 
     public void run() {
+        System.out.println("Client " + _CLIENT_ADDR + " connected on thread " + _THIS_CONNECTION);
         loadLobbies();
         sendLobbyPrompt();
         try {
@@ -132,15 +133,20 @@ public class GameConnection implements Runnable {
     }
 
     private void sendLobbyPrompt() {
-        _SERVER_PACKET_HEADER[0] = 10;
+        _SERVER_PACKET_HEADER[0] = (byte) 10;
+        _SERVER_PACKET_HEADER[1] = (byte) _THIS_CONNECTION;
         updateBufferFromServerPacketHeader(buffer);
         //tell the client you want them to select a _PLAYERS_IN_LOBBY prompt
         //write the packet to the client
         //packet has the information on the lobbies 
         //in the first 8 bytes after the server header
 
+        for (int i = 0; i < Server.gs.length; i++) {
+            buffer[_OFFSET + i] = Server._LOBBY_STATE[i];
+        }
         try {
             nOut.write(buffer);
+            System.out.println("Server sending Lobby Info to client " + _THIS_CONNECTION);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -211,23 +217,23 @@ public class GameConnection implements Runnable {
             mem_posString = new String(game.mem_pos[i].toString()); //get row i as string
             buf = mem_posString.getBytes(); //insert into appropriate area as byte[]
             int z = (_OFFSET + (i * _SEGMENT_SIZE)); //current segment byte; 
-            
+
             //load the buf-string into the buffer at the current segment 
             for (int j = 0; j < buf.length; j++) {
                 buffer[z] = buf[j]; //load into buffer beginning at offset
                 z++; //increment current segment byte
             }
         }
-        
+
         //Send to Client
         try {
             nOut.write(buffer);
         } catch (IOException ex) {
             Logger.getLogger(GameConnection.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-        
+
+
+
     }
 
     private void updateBufferFromServerPacketHeader(byte[] buf) {
