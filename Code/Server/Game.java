@@ -3,11 +3,8 @@
  * and open the template in the editor.
  */
 package server;
+//)
 
-/**
- *
- * @author Chris Mazur
- */
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -72,8 +69,7 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 	static ArrayList<Integer> counts = new ArrayList<Integer>();
 	
 	public static void loadWords() throws IOException {
-		// BufferedReader f = new BufferedReader(new FileReader("englishWords.txt"));
-		BufferedReader f = new BufferedReader(new FileReader("C:\\Users\\Chris Mazur\\Documents\\NetBeansProjects\\COSC318 Project\\src\\client\\Common English Words"));
+		BufferedReader f = new BufferedReader(new FileReader("src\\server\\Common English Words"));
 		while(true){
 			String word = f.readLine();
 			if(word==null){
@@ -98,6 +94,8 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 		g.setColor(Color.black);
 		graphics(g);
 		drawOutline(g);
+		
+
 	}
 
 	
@@ -251,7 +249,7 @@ public class Game extends JPanel implements MouseMotionListener, MouseListener, 
 		
 		for (int i = 0; i < cols; i++){
 			for (int j = 0; j < cols; j++){
-			      int k = random.nextInt(i * cols + j + 1);
+			      int k = 6;//random.nextInt(i * cols + j + 1);
 			      int swapRow = k / cols;
 			      int swapCol = k % cols;
 			      boolean tmp = hasLetter[swapRow][swapCol];

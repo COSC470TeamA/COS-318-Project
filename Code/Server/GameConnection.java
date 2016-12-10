@@ -145,8 +145,9 @@ public class GameConnection implements Runnable {
             buffer[_OFFSET + i] = Server._LOBBY_STATE[i];
         }
         try {
-            nOut.write(buffer);
+
             System.out.println("Server sending Lobby Info to client " + _THIS_CONNECTION);
+            nOut.write(buffer);
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
@@ -161,6 +162,9 @@ public class GameConnection implements Runnable {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+        
+        if (_CLIENT_PACKET_HEADER[0] == 10) System.out.println("Client has sent lobby selection of: " + _CLIENT_PACKET_HEADER[1]);
+        
         //assign to usable variables:
         //buffer[8] = selected _PLAYERS_IN_LOBBY
         _LOBBY_SELECTION = buffer[_OFFSET];
